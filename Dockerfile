@@ -1,7 +1,7 @@
-FROM ubuntu:16.04
+# FROM ubuntu:16.04
+FROM ubuntu:24.10
 
-RUN \
-    DEBIAN_FRONTEND=noninteractive && \
+RUN DEBIAN_FRONTEND=noninteractive && \
     apt-get update && \
     apt-get install -y \
         build-essential \
@@ -20,14 +20,20 @@ RUN \
         mysql-client \
         libmysqlclient-dev \
         libapreq2-dev \
-        zip && \
-    cpanm DBD::mysql && \
+        zip
+
+RUN cpanm DBD::mysql && \
+    cpanm JSON::PP && \
+    cpanm DateTime && \
     a2enmod cgid && \
     a2enmod rewrite && \
     a2dissite 000-default && \
     apt-get update -y && \
     apt-get upgrade -y && \
     apt-get -y clean
+
+# 在 apache2.conf 中设置环境变量
+RUN echo 'SetEnv MaxDiffDesignerBaseUrl https://maxdiffdesigner.sawtoothsoftware.com' >> /etc/apache2/apache2.conf
 
 COPY localhost.conf /etc/apache2/sites-enabled/localhost.conf
 
